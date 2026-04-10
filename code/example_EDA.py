@@ -100,3 +100,12 @@ plt.title("MYC and EGFR Expression in BRCA Samples")
 plt.show()
 
 # %%
+
+
+genes_to_check = ["MYC", "RAS", "EGFR", "PIK3CA", "BRAF", "HER2", "CTNNB1", "STAT3"]
+
+for gene in genes_to_check:
+    if gene in data.index:
+        print(f"{gene}: found")
+    else:
+        print(f"{gene}: NOT found")
