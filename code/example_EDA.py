@@ -1,111 +1,54 @@
-# Exploratory data analysis (EDA) on a cancer dataset
-# Loading the files and exploring the data with pandas
-# %%
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-# %%
-# Load the data
-####################################################
-data = pd.read_csv(
-    r'C:\Users\Lauren McElfresh\Documents\GitHub\Module-4-Cancer\data\TRAINING_SET_GSE62944_subsample_log2TPM.csv', index_col=0, header=0)  # can also use larger dataset with more genes
-metadata_df = pd.read_csv(
-    r'C:\Users\Lauren McElfresh\Documents\GitHub\Module-4-Cancer\data\TRAINING_SET_GSE62944_metadata.csv', index_col=0, header=0)
-print(data.head())
 
-# %%
-# Explore the data
-####################################################
-print(data.shape)
-print(data.info())
-print(data.describe())
+# Load expression data and clinical metadata
+data = pd.read_csv('data/TRAINING_SET_GSE62944_subsample_log2TPM.csv', index_col=0)
+metadata = pd.read_csv('data/TRAINING_SET_GSE62944_metadata.csv', index_col=0)
 
-# %%
-# Explore the metadata
-####################################################
-print(metadata_df.info())
-print(metadata_df.describe())
+# Filter for LUAD and LUSC samples and align indices
+lung_metadata = metadata[metadata['cancer_type'].isin(['LUAD', 'LUSC'])].copy()
+common_samples = lung_metadata.index.intersection(data.columns)
+lung_metadata = lung_metadata.loc[common_samples]
+lung_data = data[common_samples]
 
-# %%
-# Subset the data for a specific cancer type
-####################################################
-cancer_type = 'BRCA'  # Breast Invasive Carcinoma
+# List of genes related to immune checkpoints, antigen presentation, and signaling
+immune_genes = ['CD274', 'CTLA4', 'LAG3', 'HLA-A', 'B2M', 'STAT3', 'TGFB1']
 
-# From metadata, get the rows where "cancer_type" is equal to the specified cancer type
-# Then grab the index of this subset (these are the sample IDs)
-cancer_samples = metadata_df[metadata_df['cancer_type'] == cancer_type].index
-print(cancer_samples)
-# Subset the main data to include only these samples
-# When you want a subset of columns, you can pass a list of column names to the data frame in []
-BRCA_data = data[cancer_samples]
+# Verify gene presence in dataset and transpose for plotting
+available_genes = [g for g in immune_genes if g in lung_data.index]
+lung_expression = lung_data.loc[available_genes].T 
 
-# %%
-# Subset by index (genes)
-####################################################
-desired_gene_list = ['TP53', 'BRCA1', 'BRCA2', 'EGFR', 'MYC']
-gene_list = [gene for gene in desired_gene_list if gene in BRCA_data.index]
-for gene in desired_gene_list:
-    if gene not in gene_list:
-        print(f"Warning: {gene} not found in the dataset.")
+# Standardize pathologic stage labels into four main categories
+def clean_stage(stage):
+    if pd.isna(stage) or 'not' in str(stage).lower(): return 'Unknown'
+    if 'Stage IV' in stage: return 'Stage IV'
+    if 'Stage III' in stage: return 'Stage III'
+    if 'Stage II' in stage: return 'Stage II'
+    if 'Stage I' in stage: return 'Stage I'
+    return 'Unknown'
 
-# .loc[] is the method to subset by index labels
-# .iloc[] will subset by index position (integer location) instead
-BRCA_gene_data = BRCA_data.loc[gene_list]
-print(BRCA_gene_data.head())
+lung_metadata['clean_stage'] = lung_metadata['ajcc_pathologic_tumor_stage'].apply(clean_stage)
 
-# %%
-# Basic statistics on the subsetted data
-####################################################
-print(BRCA_gene_data.describe())
-print(BRCA_gene_data.var(axis=1))  # Variance of each gene across samples
-# Mean expression of each gene across samples
-print(BRCA_gene_data.mean(axis=1))
-# Median expression of each gene across samples
-print(BRCA_gene_data.median(axis=1))
+# Merge expression levels with clinical features
+combined = lung_expression.merge(lung_metadata, left_index=True, right_index=True)
 
-# %%
-# Explore categorical variables in metadata
-####################################################
-# groupby allows you to group on a specific column in the dataset,
-# and then print out summary stats or counts for other columns within those groups
-print(metadata_df.groupby('cancer_type')["gender"].value_counts())
+# Generate boxplots for each gene to compare expression across stages and subtypes
+for gene in available_genes:
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(
+        data=combined, 
+        x='clean_stage', 
+        y=gene, 
+        hue='cancer_type', 
+        order=['Stage I', 'Stage II', 'Stage III', 'Stage IV']
+    )
+    
+    plt.title(f"Immune Evasion: {gene} Expression by Stage")
+    plt.ylabel("Expression log2(TPM+1)")
+    plt.xlabel("Pathologic Stage")
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
 
-# Explore average age at diagnosis by cancer type
-metadata_df['age_at_diagnosis'] = pd.to_numeric(
-    metadata_df['age_at_diagnosis'], errors='coerce')
-print(metadata_df.groupby(
-    'cancer_type')["age_at_diagnosis"].mean())
-# %%
-# Merging datasets
-####################################################
-# Merge the subsetted expression data with metadata for BRCA samples,
-# so rows are samples and columns include gene expression for EGFR and MYC and metadata
-BRCA_metadata = metadata_df.loc[cancer_samples]
-BRCA_merged = BRCA_gene_data.T.merge(
-    BRCA_metadata, left_index=True, right_index=True)
-print(BRCA_merged.head())
-
-# %%
-# Plotting
-####################################################
-# Boxplot of EGFR expression in BRCA samples using SEABORN
-# Works really well with pandas dataframes, because most methods allow you to pass in a dataframe directly
-sns.boxplot(data=BRCA_merged, x="gender", y='EGFR')
-plt.title("EGFR Expression by Gender in BRCA Samples")
-plt.show()
-
-# Boxplot of MYC and EGFR expression in BRCA samples using PANDAS directly
-BRCA_merged[['MYC', 'EGFR']].plot.box()
-plt.title("MYC and EGFR Expression in BRCA Samples")
-plt.show()
-
-# %%
-
-
-genes_to_check = ["MYC", "RAS", "EGFR", "PIK3CA", "BRAF", "HER2", "CTNNB1", "STAT3"]
-
-for gene in genes_to_check:
-    if gene in data.index:
-        print(f"{gene}: found")
-    else:
-        print(f"{gene}: NOT found")
+# Print processing summary
+print(f"Analysis complete for {len(available_genes)} genes.")
