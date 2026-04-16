@@ -1,0 +1,21 @@
+import pandas as pd # Pandas
+import numpy as np # Numpy
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans 
+from sklearn.datasets import load_iris
+import seaborn as sns
+from sklearn.decomposition import PCA
+
+data = pd.read_csv(
+    r"C:\Users\dance\OneDrive - University of Virginia\Computational BME\Module-4-Cancer\data\TRAINING_SET_GSE62944_subsample_log2TPM.csv", index_col=0, header=0)  # can also use larger dataset with more genes
+metadata_df = pd.read_csv(
+    r"C:\Users\dance\OneDrive - University of Virginia\Computational BME\Module-4-Cancer\data\TRAINING_SET_GSE62944_metadata.csv", index_col=0, header=0)
+
+cancer_type = 'GBM' 
+cancer_samples = metadata_df[metadata_df['cancer_type'] == cancer_type].index
+GBM_data = data[cancer_samples]
+
+df = pd.DataFrame(GBM_data) #pair grid, something about any two features
+df['cluster'] = ['cancer_type']  
+g = sns.PairGrid(df, hue = "cluster", palette = "Set2")
+g.map(sns.scatterplot)

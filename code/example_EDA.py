@@ -8,9 +8,9 @@ import seaborn as sns
 # Load the data
 ####################################################
 data = pd.read_csv(
-    r"C:\Users\dance\OneDrive - University of Virginia\Computational BME\Module-4-Cancer\data\TRAINING_SET_GSE62944_subsample_log2TPM.csv", index_col=1441, header=0)  # can also use larger dataset with more genes
+    r"C:\Users\dance\OneDrive - University of Virginia\Computational BME\Module-4-Cancer\data\TRAINING_SET_GSE62944_subsample_log2TPM.csv", index_col=0, header=0)  # can also use larger dataset with more genes
 metadata_df = pd.read_csv(
-    r"C:\Users\dance\OneDrive - University of Virginia\Computational BME\Module-4-Cancer\data\TRAINING_SET_GSE62944_metadata.csv", index_col=1441, header=0)
+    r"C:\Users\dance\OneDrive - University of Virginia\Computational BME\Module-4-Cancer\data\TRAINING_SET_GSE62944_metadata.csv", index_col=0, header=0)
 print(data.head())
 
 # %%
@@ -88,15 +88,15 @@ print(GBM_merged.head())
 # %%
 # Plotting
 ####################################################
-# Boxplot of EGFR expression in GBM samples using SEABORN
+# Boxplot of STAT3 expression in GBM samples using SEABORN
 # Works really well with pandas dataframes, because most methods allow you to pass in a dataframe directly
-sns.boxplot(data=GBM_merged, x="gender", y='EGFR')
-plt.title("EGFR Expression by Gender in GBM Samples")
+sns.boxplot(data=GBM_merged, x="gender", y='STAT3')
+plt.title("STAT3 Expression by Gender in GBM Samples")
 plt.show()
 
-# Boxplot of MYC and EGFR expression in GBM samples using PANDAS directly
-GBM_merged[['MYC', 'EGFR']].plot.box()
-plt.title("MYC and EGFR Expression in GBM Samples")
+# Boxplot of LCK and STAT3 expression in GBM samples using PANDAS directly
+GBM_merged[['LCK', 'STAT3']].plot.box()
+plt.title("LCK and STAT3 Expression in GBM Samples")
 plt.show()
 
 # %%
