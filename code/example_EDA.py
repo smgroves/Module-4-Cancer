@@ -8,12 +8,10 @@ import os
 # %%
 # Load the data
 ####################################################
-directory = os.getcwd()
-
 data = pd.read_csv(
-    os.path.join(directory,'TRAINING_SET_GSE62944_subsample_log2TPM.csv'), index_col=0, header=0)  # can also use larger dataset with more genes
+    'data/TRAINING_SET_GSE62944_subsample_log2TPM.csv', index_col=0, header=0)  # can also use larger dataset with more genes
 metadata_df = pd.read_csv(
-    os.path.join(directory,'TRAINING_SET_GSE62944_metadata.csv'), index_col=0, header=0)
+    'data/TRAINING_SET_GSE62944_metadata.csv', index_col=0, header=0)
 print(data.head())
 
 # %%
