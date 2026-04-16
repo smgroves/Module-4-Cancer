@@ -42,7 +42,7 @@ LUAD_data = data[cancer_samples]
 # %%
 # Subset by index (genes)
 ####################################################
-desired_gene_list = ['TP53', 'BRAF', 'KRAS', 'EGFR', 'MYC','PIK3CA','AKT1', 'RB1', 'CDKN2A', 'PTEN','SMAD4','APC','ZEB1']
+desired_gene_list = ['TP53', 'BRAF', 'KRAS', 'EGFR', 'MYC','PIK3CA','AKT1', 'RB1', 'CDKN2A', 'PTEN','SMAD4','APC','ZEB1','SNAIL','TWIST','SLUG','ZEB2','SOX2','OCT4','KLF4']
 gene_list = [gene for gene in desired_gene_list if gene in LUAD_data.index]
 for gene in desired_gene_list:
     if gene not in gene_list:
