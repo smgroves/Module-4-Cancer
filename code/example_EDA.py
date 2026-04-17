@@ -43,6 +43,7 @@ BRCA_data = data[cancer_samples]
 # Subset by index (genes)
 ####################################################
 desired_gene_list = ['TP53', 'BRCA1', 'BRCA2', 'EGFR', 'MYC']
+hallmarks_genes = pd.read_table('/Users/danewleklinski/Desktop/Computational BME/GitHub/Module-4-Cancer/class materials/Menyhart_JPA_CancerHallmarks_core.txt', header=None, names=['gene'])
 gene_list = [gene for gene in desired_gene_list if gene in BRCA_data.index]
 for gene in desired_gene_list:
     if gene not in gene_list:
