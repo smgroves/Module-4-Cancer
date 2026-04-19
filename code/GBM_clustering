@@ -15,7 +15,14 @@ cancer_type = 'GBM'
 cancer_samples = metadata_df[metadata_df['cancer_type'] == cancer_type].index
 GBM_data = data[cancer_samples]
 
-df = pd.DataFrame(GBM_data) #pair grid, something about any two features
+desired_gene_list = ['STAT1', 'CXCR4', 'PTPN6', 'RHOA', 'STAT3', 'LCK', 'CD86', 'MAPK14', 'HCK', 'PTK2', 'HIF1A', 'PRF1']
+gene_list = [gene for gene in desired_gene_list if gene in GBM_data.index]
+for gene in desired_gene_list:
+    if gene not in gene_list:
+        print(f"Warning: {gene} not found in the dataset.")
+GBM_gene_data = GBM_data.loc[gene_list]
+
+df = pd.DataFrame(GBM_gene_data) #pair grid, something about any two features
 df['cluster'] = ['cancer_type']  
 g = sns.PairGrid(df, hue = "cluster", palette = "Set2")
 g.map(sns.scatterplot)
