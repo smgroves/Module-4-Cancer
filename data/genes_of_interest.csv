@@ -2,7 +2,7 @@ Hallmark,Gene,Full_Name,Primary_Pathway/Function
 Sustained Growth Signals,EGFR,Epidermal Growth Factor Receptor,RTK signaling
 Sustained Growth Signals,KRAS,Kirsten Rat Sarcoma Viral Oncogene Homolog,RAS/MAPK signaling
 Sustained Growth Signals,BRAF,B-Raf Proto-Oncogene,MAPK signaling
-Sustained Growth Signals,PIK3CA,Phosphatidylinositol-4,5-Bisphosphate 3-Kinase Catalytic Subunit Alpha,PI3K/AKT pathway
+Sustained Growth Signals,PIK3CA,Phosphatidylinositol-4,PI3K/AKT pathway
 Sustained Growth Signals,AKT1,AKT Serine/Threonine Kinase 1,PI3K/AKT pathway
 Sustained Growth Signals,MYC,MYC Proto-Oncogene,Transcription factor (cell proliferation)
 Evading Growth Suppressors,TP53,Tumor Protein p53,DNA damage response/apoptosis
