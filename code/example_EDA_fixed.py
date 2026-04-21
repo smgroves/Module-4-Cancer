@@ -45,7 +45,9 @@ def main():
 
     LUSC_data = data.loc[:, shared_samples]
 
-    desired_gene_list = ['ALK', 'BRAF', 'CDK-4', 'BCL-2']
+    desired_gene_list = ['ALK', 'BRAF', 'CDK-4', 'BCL-2', 'CSF-1R', 'EGFR', 'FLT3',
+        'FGFR', 'JAK', 'KIT', 'MEK', 'mTOR', 'NTRK', 'PI3K',
+        'ROS1', 'SMO', 'XPO1', 'VEGFR', 'BTK']
     # Alias map to handle gene name variations (e.g., CDK-4 -> CDK4)
     alias_map = {
         'ALK': 'ALK',

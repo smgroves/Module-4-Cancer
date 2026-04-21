@@ -130,6 +130,180 @@ def main():
     plt.title('PCA by Avg Gene Expression')
     plt.show()
 
+       # -----------------------------
+    # Simplified family history
+    # -----------------------------
+    fam_col = 'family_history_cancer_type'
+
+    if fam_col in LUSC_merged.columns:
+        def simplify_family_history(x):
+            if pd.isna(x) or x == 'nan':
+                return 'None/Unknown'
+            elif x.lower() == 'no':
+                return 'No'
+            else:
+                return 'Yes (some cancer)'
+
+        LUSC_merged['family_history_simple'] = LUSC_merged[fam_col].astype(str).apply(simplify_family_history)
+
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(
+            data=LUSC_merged,
+            x='PC1',
+            y='PC2',
+            hue='family_history_simple',
+            palette='Set1',
+            s=90
+        )
+        plt.title('PCA Colored by Family Cancer History (Simplified)')
+        plt.tight_layout()
+        plt.show()
+
+            # -----------------------------
+    # Clean + plot thyroid disease
+    # -----------------------------
+    thyroid_col = 'history_thyroid_disease'
+
+    if thyroid_col in LUSC_merged.columns:
+
+        def clean_thyroid(x):
+            x = str(x).lower()
+            if x in ['yes', 'y']:
+                return 'Yes'
+            elif x in ['no', 'n']:
+                return 'No'
+            else:
+                return 'Unknown'
+
+        LUSC_merged['thyroid_clean'] = LUSC_merged[thyroid_col].apply(clean_thyroid)
+
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(
+            data=LUSC_merged,
+            x='PC1',
+            y='PC2',
+            hue='thyroid_clean',
+            palette='Set1',
+            s=90
+        )
+        plt.title('PCA Colored by Thyroid Disease History')
+        plt.tight_layout()
+        plt.show()
+
+            # -----------------------------
+    # Plot: Ethnicity
+    # -----------------------------
+    eth_col = 'ethnicity'
+
+    if eth_col in LUSC_merged.columns:
+
+        def clean_ethnicity(x):
+            x = str(x).lower()
+
+            if 'not hispanic' in x:
+                return 'Not Hispanic'
+            elif 'hispanic' in x:
+                return 'Hispanic'
+            else:
+                return 'Unknown'
+
+        LUSC_merged['ethnicity_clean'] = LUSC_merged[eth_col].apply(clean_ethnicity)
+
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(
+            data=LUSC_merged,
+            x='PC1',
+            y='PC2',
+            hue='ethnicity_clean',
+            palette='Set1',
+            s=90
+        )
+        plt.title('PCA of LUSC Samples Colored by Ethnicity')
+        plt.xlabel('PC1')
+        plt.ylabel('PC2')
+        plt.tight_layout()
+        plt.show()
+
+    else:
+        print(f"Skipping ethnicity plot because '{eth_col}' not found.")
+    
+        # -----------------------------
+       # -----------------------------
+    # Clean + Plot Tumor Stage
+    # -----------------------------
+    stage_col = 'ajcc_pathologic_tumor_stage'
+
+    if stage_col in LUSC_merged.columns:
+
+        def simplify_stage(x):
+            x = str(x).upper()
+
+            if 'I' in x and 'II' not in x:
+                return 'Stage I'
+            elif 'II' in x and 'III' not in x:
+                return 'Stage II'
+            elif 'III' in x:
+                return 'Stage III'
+            elif 'IV' in x:
+                return 'Stage IV'
+            else:
+                return 'Unknown'
+
+        LUSC_merged['stage_simple'] = LUSC_merged[stage_col].apply(simplify_stage)
+
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(
+            data=LUSC_merged,
+            x='PC1',
+            y='PC2',
+            hue='stage_simple',
+            palette='Set2',
+            s=90
+        )
+        plt.title('PCA Colored by Tumor Stage (Simplified)')
+        plt.tight_layout()
+        plt.show()
+    
+        # -----------------------------
+    # Plot: Race
+    # -----------------------------
+    race_col = 'race'
+
+    if race_col in LUSC_merged.columns:
+
+        def clean_race(x):
+            x = str(x).lower()
+
+            if 'white' in x:
+                return 'White'
+            elif 'black' in x:
+                return 'Black'
+            elif 'asian' in x:
+                return 'Asian'
+            elif 'native' in x:
+                return 'Native'
+            else:
+                return 'Other/Unknown'
+
+        LUSC_merged['race_clean'] = LUSC_merged[race_col].apply(clean_race)
+
+        plt.figure(figsize=(8, 6))
+        sns.scatterplot(
+            data=LUSC_merged,
+            x='PC1',
+            y='PC2',
+            hue='race_clean',
+            palette='Set2',
+            s=90
+        )
+        plt.title('PCA of LUSC Samples Colored by Race')
+        plt.xlabel('PC1')
+        plt.ylabel('PC2')
+        plt.tight_layout()
+        plt.show()
+
+    else:
+        print(f"Skipping race plot because '{race_col}' not found.")
     # -----------------------------
     # Step 6: KMeans Clustering
     # -----------------------------
