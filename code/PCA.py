@@ -321,6 +321,16 @@ def main():
         hue='cluster',
         palette='Set2'
     )
+    
+    # Add cluster centroid labels
+    for cluster in range(kmeans.n_clusters):
+        cluster_points = LUSC_merged[LUSC_merged['cluster'] == cluster]
+        centroid_pc1 = cluster_points['PC1'].mean()
+        centroid_pc2 = cluster_points['PC2'].mean()
+        plt.text(centroid_pc1, centroid_pc2, f'C{cluster}', 
+                fontsize=12, fontweight='bold', ha='center', va='center',
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.7))
+    
     plt.title('KMeans Clustering (k=3)')
     plt.show()
 
