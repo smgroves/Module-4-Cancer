@@ -428,6 +428,99 @@ def main():
                 plt.tight_layout()
                 plt.show()
                 
+                # =====================================================
+                # KMeans Clustering on Smoking PCA
+                # =====================================================
+                print('\n' + '='*60)
+                print('KMeans Clustering on Smoking-Gene PCA')
+                print('='*60)
+                
+                # KMeans with k=3
+                kmeans_smk = KMeans(n_clusters=3, random_state=0)
+                smoking_data['cluster'] = kmeans_smk.fit_predict(X_smoking)
+                
+                plt.figure(figsize=(10, 6))
+                scatter = plt.scatter(
+                    smoking_data['PC1'],
+                    smoking_data['PC2'],
+                    c=smoking_data['cluster'],
+                    cmap='viridis',
+                    s=100,
+                    alpha=0.6,
+                    edgecolors='black',
+                    linewidth=0.5
+                )
+                plt.colorbar(scatter, label='Cluster')
+                plt.xlabel(f'PC1 ({pca.explained_variance_ratio_[0]*100:.1f}% variance)')
+                plt.ylabel(f'PC2 ({pca.explained_variance_ratio_[1]*100:.1f}% variance)')
+                plt.title('KMeans Clustering (k=3) on Smoking-Correlated Genes PCA')
+                plt.grid(True, alpha=0.3)
+                plt.tight_layout()
+                plt.show()
+                
+                # =====================================================
+                # UMAP Visualization of Smoking PCA
+                # =====================================================
+                print('\nGenerating UMAP visualization...')
+                
+                try:
+                    from umap import UMAP
+                    
+                    # Get the subset of X_scaled corresponding to smoking_data samples
+                    smoking_indices = [i for i, idx in enumerate(X.index) if idx in smoking_data.index]
+                    X_scaled_subset = X_scaled[smoking_indices]
+                    
+                    # Apply UMAP to the scaled gene expression
+                    umap_model = UMAP(n_components=2, random_state=0)
+                    X_umap = umap_model.fit_transform(X_scaled_subset)
+                    
+                    # Get smoking values in same order as X_scaled_subset
+                    y_smoking_vals = smoking_data[smoking_col].values.astype(float)
+                    cluster_vals = smoking_data['cluster'].values.astype(int)
+                    
+                    # Plot UMAP colored by smoking pack years
+                    plt.figure(figsize=(10, 6))
+                    scatter = plt.scatter(
+                        X_umap[:, 0],
+                        X_umap[:, 1],
+                        c=y_smoking_vals,
+                        cmap='coolwarm',
+                        s=100,
+                        alpha=0.6,
+                        edgecolors='black',
+                        linewidth=0.5
+                    )
+                    plt.colorbar(scatter, label='Pack Years Smoked')
+                    plt.xlabel('UMAP 1')
+                    plt.ylabel('UMAP 2')
+                    plt.title('UMAP of Smoking-Correlated Genes Expression\nColored by Pack Years Smoked')
+                    plt.grid(True, alpha=0.3)
+                    plt.tight_layout()
+                    plt.show()
+                    
+                    # UMAP colored by KMeans cluster
+                    plt.figure(figsize=(10, 6))
+                    scatter = plt.scatter(
+                        X_umap[:, 0],
+                        X_umap[:, 1],
+                        c=cluster_vals,
+                        cmap='viridis',
+                        s=100,
+                        alpha=0.6,
+                        edgecolors='black',
+                        linewidth=0.5
+                    )
+                    plt.colorbar(scatter, label='Cluster')
+                    plt.xlabel('UMAP 1')
+                    plt.ylabel('UMAP 2')
+                    plt.title('UMAP of Smoking-Correlated Genes Expression\nColored by KMeans Cluster')
+                    plt.grid(True, alpha=0.3)
+                    plt.tight_layout()
+                    plt.show()
+                    
+                except ImportError:
+                    print('UMAP not installed. Skipping UMAP visualization.')
+                
             else:
                 print('No smoking data available for LUSC samples')
         else:
