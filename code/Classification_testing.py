@@ -64,8 +64,6 @@ gene_summary = pd.DataFrame({
     "non_missing_count": LUAD_gene_data.count(axis=1),
     "missing_count": LUAD_gene_data.isna().sum(axis=1)
 })
-print("HERE IS THE GENE SUMMARY:")
-print(gene_summary)
 
 # %%
 # Basic statistics on the subsetted data
@@ -92,36 +90,6 @@ LUAD_merged = LUAD_gene_data.T.merge(
     LUAD_metadata, left_index=True, right_index=True)
 print(LUAD_merged.head())
 
-# %%
-# Plotting
-####################################################
-sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='EGFR')
-plt.title("EGFR Expression by Tumor Stage in LUAD Samples")
-plt.show()
-
-sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='JAK1')
-plt.title("JAK1 Expression by Tumor Stage in LUAD Samples")
-plt.show()
-
-sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='JAK2')
-plt.title("JAK2 Expression by Tumor Stage in LUAD Samples")
-plt.show()
-
-sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='MTOR')
-plt.title("MTOR Expression by Tumor Stage in LUAD Samples")
-plt.show()
-
-sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='PIK3CA')
-plt.title("PIK3CA Expression by Tumor Stage in LUAD Samples")
-plt.show()
-
-sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='PIK3CB')
-plt.title("PIK3CB Expression by Tumor Stage in LUAD Samples")
-plt.show()
-
-LUAD_merged[['EGFR', 'JAK1', 'JAK2']].plot.box()
-plt.title("EGFR, JAK1, and JAK2 Expression in LUAD Samples")
-plt.show()
 
 # %%
 ## Generative Ai was used to help write the following code. (Claude, 2026)
@@ -202,15 +170,7 @@ plt.scatter(X_pca[:, 0], X_pca[:, 1],
 
 from matplotlib.patches import Patch
 legend_elements = [Patch(facecolor=palette[s], label=s) for s in stage_order]
-plt.legend(handles=legend_elements, title='Tumor Stage',
-           bbox_to_anchor=(1.05, 1), loc='upper left')
 
-plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]*100:.1f}% variance)")
-plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]*100:.1f}% variance)")
-plt.title("PCA Projection of LUAD Samples\n(Immune Evasion + Angiogenesis Genes)")
-plt.tight_layout()
-plt.savefig('pca_luad.png', dpi=150, bbox_inches='tight')
-plt.show()
 
 # %%
 # PCA — Immune Evasion Genes Only
@@ -225,22 +185,7 @@ n_components_immune = min(2, len(immune_found))
 pca_immune = PCA(n_components=n_components_immune, random_state=42)
 X_pca_immune = pca_immune.fit_transform(X_immune_scaled)
 
-print(f"Immune PCA — PC1 variance explained: {pca_immune.explained_variance_ratio_[0]:.3f}")
-print(f"Immune PCA — PC2 variance explained: {pca_immune.explained_variance_ratio_[1]:.3f}")
 
-plt.figure(figsize=(8, 6))
-plt.scatter(X_pca_immune[:, 0], X_pca_immune[:, 1],
-            c=[list(palette.values())[stage_order.index(s)] for s in stage_labels],
-            s=60, alpha=0.8)
-legend_elements = [Patch(facecolor=palette[s], label=s) for s in stage_order]
-plt.legend(handles=legend_elements, title='Tumor Stage',
-           bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.xlabel(f"PC1 ({pca_immune.explained_variance_ratio_[0]*100:.1f}% variance)")
-plt.ylabel(f"PC2 ({pca_immune.explained_variance_ratio_[1]*100:.1f}% variance)")
-plt.title("PCA Projection of LUAD Samples\n(Immune Evasion Genes Only)")
-plt.tight_layout()
-plt.savefig('pca_immune.png', dpi=150, bbox_inches='tight')
-plt.show()
 
 # %%
 # PCA — Angiogenesis Genes Only
@@ -254,22 +199,6 @@ n_components_angio = min(2, len(angio_found))
 pca_angio = PCA(n_components=n_components_angio, random_state=42)
 X_pca_angio = pca_angio.fit_transform(X_angio_scaled)
 
-print(f"Angio PCA — PC1 variance explained: {pca_angio.explained_variance_ratio_[0]:.3f}")
-print(f"Angio PCA — PC2 variance explained: {pca_angio.explained_variance_ratio_[1]:.3f}")
-
-plt.figure(figsize=(8, 6))
-plt.scatter(X_pca_angio[:, 0], X_pca_angio[:, 1],
-            c=[list(palette.values())[stage_order.index(s)] for s in stage_labels],
-            s=60, alpha=0.8)
-legend_elements = [Patch(facecolor=palette[s], label=s) for s in stage_order]
-plt.legend(handles=legend_elements, title='Tumor Stage',
-           bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.xlabel(f"PC1 ({pca_angio.explained_variance_ratio_[0]*100:.1f}% variance)")
-plt.ylabel(f"PC2 ({pca_angio.explained_variance_ratio_[1]*100:.1f}% variance)")
-plt.title("PCA Projection of LUAD Samples\n(Angiogenesis Genes Only)")
-plt.tight_layout()
-plt.savefig('pca_angio.png', dpi=150, bbox_inches='tight')
-plt.show()
 
 # %%
 # Logistic Regression — Combined Immune + Angiogenesis Genes
