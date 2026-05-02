@@ -217,6 +217,7 @@ def main():
                 print('EVALUATING ON VALIDATION SET')
                 print('='*60)
                 
+                
                 # Get validation set smoking data
                 LUSC_val_smoking = LUSC_merged_val.copy()
                 LUSC_val_smoking = LUSC_val_smoking.merge(
@@ -389,7 +390,61 @@ def main():
     
     else:
         print(f'Smoking data file not found at: {smoking_path}')
-
+compute_regression_metrics(
+    y_train_smoking,
+    y_train_pred,
+    y_val_smoking,
+    y_val_pred
+)
 
 if __name__ == '__main__':
     main()
+
+def compute_regression_metrics(y_train_true, y_train_pred, y_val_true, y_val_pred):
+    import numpy as np
+    from sklearn.metrics import r2_score
+
+    # Flatten
+    y_train_true = y_train_true.flatten()
+    y_train_pred = y_train_pred.flatten()
+    y_val_true = y_val_true.flatten()
+    y_val_pred = y_val_pred.flatten()
+
+    # Residuals
+    train_residuals = y_train_true - y_train_pred
+    val_residuals = y_val_true - y_val_pred
+
+    # Absolute metrics
+    train_mae = np.mean(np.abs(train_residuals))
+    val_mae = np.mean(np.abs(val_residuals))
+
+    train_rmse = np.sqrt(np.mean(train_residuals**2))
+    val_rmse = np.sqrt(np.mean(val_residuals**2))
+
+    # R2
+    train_r2 = r2_score(y_train_true, y_train_pred)
+    val_r2 = r2_score(y_val_true, y_val_pred)
+
+    # Baseline (mean)
+    baseline_train = np.full_like(y_train_true, y_train_true.mean())
+    baseline_val = np.full_like(y_val_true, y_train_true.mean())
+
+    baseline_train_mae = np.mean(np.abs(y_train_true - baseline_train))
+    baseline_val_mae = np.mean(np.abs(y_val_true - baseline_val))
+
+    # Improvement
+    train_improve = 100 * (baseline_train_mae - train_mae) / baseline_train_mae
+    val_improve = 100 * (baseline_val_mae - val_mae) / baseline_val_mae
+
+    print('\n==== REGRESSION METRICS ====')
+    print('\nTRAINING (in-sample)')
+    print(f'MAE: {train_mae:.3f}')
+    print(f'RMSE: {train_rmse:.3f}')
+    print(f'R²: {train_r2:.3f}')
+    print(f'Improvement vs baseline: {train_improve:.2f}%')
+
+    print('\nVALIDATION (out-of-sample)')
+    print(f'MAE: {val_mae:.3f}')
+    print(f'RMSE: {val_rmse:.3f}')
+    print(f'R²: {val_r2:.3f}')
+    print(f'Improvement vs baseline: {val_improve:.2f}%')

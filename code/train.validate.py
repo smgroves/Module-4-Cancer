@@ -424,19 +424,127 @@ y_val_pred = X_val_b @ theta
 mse_val = mean_squared_error(y_val_smoking, y_val_pred)
 r2_val = r2_score(y_val_smoking, y_val_pred)
 
-print("\nValidation Results")
+print("\nValidation Results (Gradient Descent)")
 print(f"Validation MSE: {mse_val:.4f}")
 print(f"Validation R²: {r2_val:.4f}")
 
 
 # =====================================================
-# Absolute + relative metrics
+# Elastic Net Regression
 # =====================================================
+from sklearn.linear_model import ElasticNet
+
+print("\n" + "="*60)
+print("ELASTIC NET REGRESSION")
+print("="*60)
+
+# ElasticNet with alpha=0.1 and l1_ratio=0.5 (balanced L1/L2)
+elastic_net = ElasticNet(alpha=0.1, l1_ratio=0.5, random_state=0, max_iter=10000)
+
+# Fit on training data
+elastic_net.fit(X_train_scaled_smk, y_train_smoking.ravel())
+
+print(f"\nElastic Net Coefficients")
+print(f"Intercept: {elastic_net.intercept_:.4f}")
+print(f"PC1 weight: {elastic_net.coef_[0]:.4f}")
+print(f"PC2 weight: {elastic_net.coef_[1]:.4f}")
+
+# Predictions
+y_train_pred_en = elastic_net.predict(X_train_scaled_smk)
+y_val_pred_en = elastic_net.predict(X_val_scaled_smk)
+
+# Metrics
+mse_train_en = mean_squared_error(y_train_smoking, y_train_pred_en)
+r2_train_en = r2_score(y_train_smoking, y_train_pred_en)
+
+mse_val_en = mean_squared_error(y_val_smoking, y_val_pred_en)
+r2_val_en = r2_score(y_val_smoking, y_val_pred_en)
+
+print(f"\nElastic Net Results")
+print(f"Training MSE: {mse_train_en:.4f}, R²: {r2_train_en:.4f}")
+print(f"Validation MSE: {mse_val_en:.4f}, R²: {r2_val_en:.4f}")
+
+# Actual vs predicted plot for Elastic Net
+plt.figure(figsize=(8, 6))
+plt.scatter(y_val_smoking, y_val_pred_en, s=80, alpha=0.7, label="Elastic Net predictions")
+
+min_val = min(y_val_smoking.min(), y_val_pred_en.min())
+max_val = max(y_val_smoking.max(), y_val_pred_en.max())
+
+plt.plot([min_val, max_val], [min_val, max_val], linestyle="--", label="Perfect prediction")
+plt.axhline(y_train_smoking.mean(), linestyle=":", label="Mean baseline")
+
+plt.xlabel("Actual Pack Years Smoked")
+plt.ylabel("Predicted Pack Years Smoked")
+plt.title("Elastic Net: Validation Set Actual vs Predicted")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+
+# =====================================================
+# Model Comparison
+# =====================================================
+print("\n" + "="*60)
+print("MODEL COMPARISON: GRADIENT DESCENT vs ELASTIC NET")
+print("="*60)
+
+comparison_df = pd.DataFrame({
+    "Model": ["Gradient Descent", "Elastic Net"],
+    "Train_MSE": [
+        mean_squared_error(y_train_smoking, y_train_pred),
+        mse_train_en
+    ],
+    "Train_R2": [
+        r2_score(y_train_smoking, y_train_pred),
+        r2_train_en
+    ],
+    "Val_MSE": [mse_val, mse_val_en],
+    "Val_R2": [r2_val, r2_val_en]
+})
+
+print("\n" + comparison_df.to_string(index=False))
+
+# Comparison plot
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# MSE comparison
+axes[0].bar(["GD Train", "EN Train", "GD Val", "EN Val"],
+            [mean_squared_error(y_train_smoking, y_train_pred), 
+             mse_train_en,
+             mse_val,
+             mse_val_en])
+axes[0].set_ylabel("MSE")
+axes[0].set_title("MSE: Gradient Descent vs Elastic Net")
+axes[0].grid(True, alpha=0.3)
+
+# R2 comparison
+axes[1].bar(["GD Train", "EN Train", "GD Val", "EN Val"],
+            [r2_score(y_train_smoking, y_train_pred),
+             r2_train_en,
+             r2_val,
+             r2_val_en])
+axes[1].set_ylabel("R²")
+axes[1].set_title("R²: Gradient Descent vs Elastic Net")
+axes[1].axhline(0, linestyle="--", color="red", alpha=0.5)
+axes[1].grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+
+# =====================================================
+# Absolute + relative metrics (using Elastic Net)
+# =====================================================
+print("\n" + "="*60)
+print("ELASTIC NET: DETAILED METRICS")
+print("="*60)
 metrics_df = compute_regression_metrics(
     y_train_smoking,
-    y_train_pred,
+    y_train_pred_en,
     y_val_smoking,
-    y_val_pred
+    y_val_pred_en
 )
 
 
