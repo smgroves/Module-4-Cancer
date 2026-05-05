@@ -12,7 +12,9 @@ from sklearn.datasets import load_breast_cancer
 cancer = load_breast_cancer(as_frame=True)
 X = cancer.data
 y = cancer.target
-print(cancer.DESCR)
+#print(cancer.DESCR)
+
+
 
 # %%
 y_label = [{0: "malignant", 1: "benign"}[i] for i in y]
@@ -24,6 +26,7 @@ sns.scatterplot(x=X["mean radius"],
 feature_1 = "mean radius"
 feature_2 = "mean smoothness"
 X = X[[feature_1, feature_2]].values
+print(X)
 
 # %%
 # Logistic regression

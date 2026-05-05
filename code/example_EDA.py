@@ -8,9 +8,9 @@ import seaborn as sns
 # Load the data
 ####################################################
 data = pd.read_csv(
-    '../Data/TRAINING_SET_GSE62944_subsample_log2TPM.csv', index_col=0, header=0)  # can also use larger dataset with more genes
+    'C:\\Users\\Jmarc\\Desktop\\Comp BME\\Module-4-Cancer\\data\\TRAINING_SET_GSE62944_subsample_log2TPM.csv', index_col=0, header=0)  # can also use larger dataset with more genes
 metadata_df = pd.read_csv(
-    '../Data/TRAINING_SET_GSE62944_metadata.csv', index_col=0, header=0)
+    'C:\\Users\\Jmarc\\Desktop\\Comp BME\\Module-4-Cancer\\data\\TRAINING_SET_GSE62944_metadata.csv', index_col=0, header=0)
 print(data.head())
 
 # %%
@@ -29,7 +29,7 @@ print(metadata_df.describe())
 # %%
 # Subset the data for a specific cancer type
 ####################################################
-cancer_type = 'BRCA'  # Breast Invasive Carcinoma
+cancer_type = 'LUAD'  # Lung Adenocarcinoma
 
 # From metadata, get the rows where "cancer_type" is equal to the specified cancer type
 # Then grab the index of this subset (these are the sample IDs)
@@ -37,38 +37,38 @@ cancer_samples = metadata_df[metadata_df['cancer_type'] == cancer_type].index
 print(cancer_samples)
 # Subset the main data to include only these samples
 # When you want a subset of columns, you can pass a list of column names to the data frame in []
-BRCA_data = data[cancer_samples]
+LUAD_data = data[cancer_samples]
 
 # %%
 # Subset by index (genes)
 ####################################################
-desired_gene_list = ['TP53', 'BRCA1', 'BRCA2', 'EGFR', 'MYC']
-gene_list = [gene for gene in desired_gene_list if gene in BRCA_data.index]
+desired_gene_list = ['EGFR', 'JAK1', 'JAK2', 'MTOR', 'PIK3CA', 'PIK3CB']
+gene_list = [gene for gene in desired_gene_list if gene in LUAD_data.index]
 for gene in desired_gene_list:
     if gene not in gene_list:
         print(f"Warning: {gene} not found in the dataset.")
 
 # .loc[] is the method to subset by index labels
 # .iloc[] will subset by index position (integer location) instead
-BRCA_gene_data = BRCA_data.loc[gene_list]
-print(BRCA_gene_data.head())
+LUAD_gene_data = LUAD_data.loc[gene_list]
+print(LUAD_gene_data.head())
 
 # %%
 # Basic statistics on the subsetted data
 ####################################################
-print(BRCA_gene_data.describe())
-print(BRCA_gene_data.var(axis=1))  # Variance of each gene across samples
+print(LUAD_gene_data.describe())
+print(LUAD_gene_data.var(axis=1))  # Variance of each gene across samples
 # Mean expression of each gene across samples
-print(BRCA_gene_data.mean(axis=1))
+print(LUAD_gene_data.mean(axis=1))
 # Median expression of each gene across samples
-print(BRCA_gene_data.median(axis=1))
+print(LUAD_gene_data.median(axis=1))
 
 # %%
 # Explore categorical variables in metadata
 ####################################################
 # groupby allows you to group on a specific column in the dataset,
 # and then print out summary stats or counts for other columns within those groups
-print(metadata_df.groupby('cancer_type')["gender"].value_counts())
+print(metadata_df.groupby('cancer_type')["ajcc_pathologic_tumor_stage"].value_counts())
 
 # Explore average age at diagnosis by cancer type
 metadata_df['age_at_diagnosis'] = pd.to_numeric(
@@ -78,25 +78,45 @@ print(metadata_df.groupby(
 # %%
 # Merging datasets
 ####################################################
-# Merge the subsetted expression data with metadata for BRCA samples,
+# Merge the subsetted expression data with metadata for LUAD samples,
 # so rows are samples and columns include gene expression for EGFR and MYC and metadata
-BRCA_metadata = metadata_df.loc[cancer_samples]
-BRCA_merged = BRCA_gene_data.T.merge(
-    BRCA_metadata, left_index=True, right_index=True)
-print(BRCA_merged.head())
+LUAD_metadata = metadata_df.loc[cancer_samples]
+LUAD_merged = LUAD_gene_data.T.merge(
+    LUAD_metadata, left_index=True, right_index=True)
+print(LUAD_merged.head())
 
 # %%
 # Plotting
 ####################################################
-# Boxplot of EGFR expression in BRCA samples using SEABORN
+# Boxplot of EGFR expression in LUAD samples using SEABORN
 # Works really well with pandas dataframes, because most methods allow you to pass in a dataframe directly
-sns.boxplot(data=BRCA_merged, x="gender", y='EGFR')
-plt.title("EGFR Expression by Gender in BRCA Samples")
+sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='EGFR')
+plt.title("EGFR Expression by Tumor Stage in LUAD Samples")
 plt.show()
 
-# Boxplot of MYC and EGFR expression in BRCA samples using PANDAS directly
-BRCA_merged[['MYC', 'EGFR']].plot.box()
-plt.title("MYC and EGFR Expression in BRCA Samples")
+sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='JAK1')
+plt.title("JAK1 Expression by Tumor Stage in LUAD Samples")
+plt.show()
+
+sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='JAK2')
+plt.title("JAK2 Expression by Tumor Stage in LUAD Samples")
+plt.show()
+
+sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='MTOR')
+plt.title("MTOR Expression by Tumor Stage in LUAD Samples")
+plt.show()
+
+sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='PIK3CA')
+plt.title("PIK3CA Expression by Tumor Stage in LUAD Samples")
+plt.show()
+
+sns.boxplot(data=LUAD_merged, x="ajcc_pathologic_tumor_stage", y='PIK3CB')
+plt.title("PIK3CB Expression by Tumor Stage in LUAD Samples")
+plt.show()
+
+# Boxplot of MYC and EGFR expression in LUAD samples using PANDAS directly
+LUAD_merged[['EGFR', 'JAK1', 'JAK2']].plot.box()
+plt.title("EGFR, JAK1, and JAK2 Expression in LUAD Samples")
 plt.show()
 
 # %%
