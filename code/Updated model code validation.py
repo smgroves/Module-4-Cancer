@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import ConfusionMatrixDisplay, accuracy_score
 import joblib
 
 # Load validation data
@@ -61,3 +61,18 @@ print(f"Out-of-sample Accuracy (Early vs Late Prediction): {acc:.2f}")
 
 # Save model
 joblib.dump(model, "lung_stage_model_binary.pkl")
+
+# Confusion matrix
+fig, ax = plt.subplots(figsize=(6, 5))
+
+ConfusionMatrixDisplay.from_predictions(
+    y,
+    y_pred,
+    cmap=plt.cm.Blues,
+    ax=ax,
+    normalize=None
+)
+
+ax.set_title("Confusion Matrix (Stage Prediction - Validation)")
+plt.tight_layout()
+plt.show()
